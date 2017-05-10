@@ -8,6 +8,7 @@ from tqdm import tqdm
 from model import CNN
 
 from sobamchan.sobamchan_iterator import Iterator
+from sobamchan.sobamchan_log import Log
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -40,6 +41,9 @@ def train(model):
     train_n = len(train_t)
     test_n = len(test_t)
 
+    train_loss_log = Log()
+    test_loss_log = Log()
+    test_acc_log = Log()
 
     for _ in range(epoch):
 
@@ -58,7 +62,9 @@ def train(model):
 
             loss.backward()
             optimizer.update()
-        print('train loss: {}'.format(loss_sum/train_n)) 
+        loss_mean = loss_sum/train_n
+        train_loss_log.add(loss_mean)
+        print('train loss: {}'.format(loss_mean)) 
 
         order = np.random.permutation(test_n)
         test_x_iter = Iterator(test_x, bs, order)
@@ -73,9 +79,17 @@ def train(model):
             loss, acc = model(x, t, train=False)
             loss_sum += loss.data * x_n
             acc_sum += acc.data * x_n
-        print('test loss: {}'.format(loss_sum/test_n))
-        print('test acc: {}'.format(acc_sum/test_n))
+        loss_mean = loss_sum / test_n
+        acc_mean = acc_sum / test_n
+        test_loss_log.add(loss_mean)
+        test_acc_log.add(acc_mean)
+        print('test loss: {}'.format(loss_mean))
+        print('test acc: {}'.format(acc_mean))
 
+
+    train_loss_log.save('./results/train_loss_log')
+    test_loss_log.save('./results/test_loss_log')
+    test_acc_log.save('./results/test_acc_log')
 
 if __name__ == '__main__':
     from model import CNN
