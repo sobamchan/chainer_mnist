@@ -62,7 +62,7 @@ def train(model):
 
             loss.backward()
             optimizer.update()
-        loss_mean = loss_sum/train_n
+        loss_mean = float(loss_sum/train_n)
         train_loss_log.add(loss_mean)
         print('train loss: {}'.format(loss_mean)) 
 
@@ -79,8 +79,8 @@ def train(model):
             loss, acc = model(x, t, train=False)
             loss_sum += loss.data * x_n
             acc_sum += acc.data * x_n
-        loss_mean = loss_sum / test_n
-        acc_mean = acc_sum / test_n
+        loss_mean = float(loss_sum / test_n)
+        acc_mean = float(acc_sum / test_n)
         test_loss_log.add(loss_mean)
         test_acc_log.add(acc_mean)
         print('test loss: {}'.format(loss_mean))
