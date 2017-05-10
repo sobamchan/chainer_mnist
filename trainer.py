@@ -18,14 +18,16 @@ def get_args():
     return parser.parse_args()
 
 
-def train(args):
+def train(model):
+
+    args = get_args()
 
     bs = args.bs
     epoch = args.epoch
     gpu = args.gpu
 
     optimizer = optimizers.AdaGrad()
-    model = CNN()
+    model = model()
     xp = model.check_gpu(gpu)
     optimizer.setup(model)
 
@@ -76,5 +78,5 @@ def train(args):
 
 
 if __name__ == '__main__':
-    args = get_args()
-    train(args)
+    from model import CNN
+    train(CNN)
