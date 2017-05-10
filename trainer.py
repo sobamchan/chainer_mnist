@@ -41,7 +41,7 @@ def train(args):
 
     for _ in range(epoch):
 
-        order = xp.random.permutation(train_n)
+        order = np.random.permutation(train_n)
         train_x_iter = Iterator(train_x, bs, order, shuffle=False)
         train_t_iter = Iterator(train_t, bs, order, shuffle=False)
 
@@ -58,7 +58,7 @@ def train(args):
             optimizer.update()
         print('train loss: {}'.format(loss_sum/train_n)) 
 
-        order = xp.random.permutation(test_n)
+        order = np.random.permutation(test_n)
         test_x_iter = Iterator(test_x, bs, order)
         test_t_iter = Iterator(test_t, bs, order)
         loss_sum = 0
