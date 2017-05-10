@@ -24,23 +24,24 @@ def train(args):
     epoch = args.epoch
     gpu = args.gpu
 
-    train, test = datasets.get_mnist()
-    train_x = np.array([x[0].reshape((1, 28, 28)) for x in train])
-    train_t = np.array([x[1] for x in train])
-    test_x = np.array([x[0].reshape((1, 28, 28)) for x in test])
-    test_t = np.array([x[1] for x in test])
-
-    train_n = len(train_t)
-    test_n = len(test_t)
-
     optimizer = optimizers.AdaGrad()
     model = CNN()
     xp = model.check_gpu(gpu)
     optimizer.setup(model)
 
+    train, test = datasets.get_mnist()
+    train_x = xp.array([x[0].reshape((1, 28, 28)) for x in train])
+    train_t = xp.array([x[1] for x in train])
+    test_x = xp.array([x[0].reshape((1, 28, 28)) for x in test])
+    test_t = xp.array([x[1] for x in test])
+
+    train_n = len(train_t)
+    test_n = len(test_t)
+
+
     for _ in range(epoch):
 
-        order = np.random.permutation(train_n)
+        order = xp.random.permutation(train_n)
         train_x_iter = Iterator(train_x, bs, order, shuffle=False)
         train_t_iter = Iterator(train_t, bs, order, shuffle=False)
 
@@ -57,7 +58,7 @@ def train(args):
             optimizer.update()
         print('train loss: {}'.format(loss_sum/train_n)) 
 
-        order = np.random.permutation(test_n)
+        order = xp.random.permutation(test_n)
         test_x_iter = Iterator(test_x, bs, order)
         test_t_iter = Iterator(test_t, bs, order)
         loss_sum = 0
@@ -65,8 +66,8 @@ def train(args):
         for x, t in zip(test_x_iter, test_t_iter):
             model.cleargrads()
             x_n = len(x)
-            x = model.prepare_input(x)
-            t = model.prepare_input(t, dtype=np.int32)
+            x = model.prepare_input(x, dtype=xp.float32, xp=xp)
+            t = model.prepare_input(t, dtype=xp.int32, xp=xp)
             loss, acc = model(x, t, train=False)
             loss_sum += loss.data * x_n
             acc_sum += acc.data * x_n
